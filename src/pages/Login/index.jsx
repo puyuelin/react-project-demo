@@ -1,8 +1,10 @@
 import React, { Component } from "react";
+// import { Redirect } from "react-router-dom";
 import { Form, Input, Button, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
 import memoryUtils from "../../utils/memoryUtils";
+import storageUtils from "../../utils/storageUtils";
 import { reqLogin } from "../../api";
 
 import logo from "../../assets/images/logo.png";
@@ -14,8 +16,12 @@ export default class Login extends Component {
     const result = await reqLogin(username, password);
 
     if (result.status === 0) {
-      message.success("登录成功", 2);
-      memoryUtils.user = result.data;
+      message.success("登录成功");
+
+      const user = result.data;
+      memoryUtils.user = user;
+      storageUtils.saveUser(user);
+
       this.props.history.replace("/");
     } else {
       message.error(result.msg);
@@ -39,6 +45,10 @@ export default class Login extends Component {
   };
 
   render() {
+    /* const user = memoryUtils.user;
+    if (user && user._id) {
+      return <Redirect to="/" />;
+    } */
     return (
       <div className="login">
         <header className="login-header">
