@@ -9,6 +9,16 @@ import menuList from "../../config/menuConfig";
 const { SubMenu } = Menu;
 
 class LeftNav extends Component {
+  state = {
+    collapsed: false,
+  };
+
+  toggleCollapsed = () => {
+    this.setState({
+      collapsed: !this.state.collapsed,
+    });
+  };
+
   getMenuNodes = (menuList) => {
     return menuList.map((item) => {
       if (!item.children) {
@@ -31,10 +41,15 @@ class LeftNav extends Component {
     this.props.history.replace(key);
   };
 
+  handleOpenChange = (openKeys) => {
+    this.path = openKeys;
+  };
+
   render() {
     let path = this.props.location.pathname;
-    if (path.indexOf("/product") === 0) {
-      path = "/product";
+    let selectedPath = path;
+    if (selectedPath.indexOf("/products") === 0) {
+      selectedPath = "/products";
     }
 
     return (
@@ -45,11 +60,10 @@ class LeftNav extends Component {
         </Link>
 
         <Menu
-          defaultOpenKeys={[path]}
-          defaultSelectedKeys={[path]}
-          selectedKeys={[path]}
           mode="inline"
           theme="dark"
+          defaultOpenKeys={[selectedPath]}
+          defaultSelectedKeys={[path]}
           onClick={this.handleClick}
         >
           {this.getMenuNodes(menuList)}

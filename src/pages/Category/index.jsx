@@ -121,8 +121,10 @@ export default class Category extends Component {
       showStatus,
     } = this.state;
 
+    const category = this.category || {};
+
     const extra = (
-      <Button type="primary" icon={<PlusOutlined />}>
+      <Button type="primary" icon={<PlusOutlined />} onClick={this.showAdd}>
         添加
       </Button>
     );
@@ -138,7 +140,7 @@ export default class Category extends Component {
       );
 
     return (
-      <Card title={title} extra={extra}>
+      <Card title={title} extra={extra} bordered={false}>
         <Table
           bordered
           rowKey="_id"

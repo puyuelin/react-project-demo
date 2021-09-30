@@ -28,7 +28,7 @@ export default class Admin extends Component {
           <Content style={{margin: 20, backgroundColor: '#fff'}}>
             <Switch>
               <Route path="/home" component={Home} />
-              <Route path="/category" component={Category} />
+              <Route path="/products/category" component={Category} />
               <Redirect to="/home" />
             </Switch>
           </Content>
