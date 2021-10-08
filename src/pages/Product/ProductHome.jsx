@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Card, Select, Input, Button, Table } from "antd";
+import { Card, Select, Input, Button, Table, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
 import LinkButton from "../../components/LinkButton";
@@ -17,6 +17,7 @@ export default class ProductHome extends Component {
     searchType: "productName", // 根据哪个字段搜索
   };
 
+  // 初始化table的列的数组
   initColumns = () => {
     this.columns = [
       {
@@ -78,12 +79,38 @@ export default class ProductHome extends Component {
     ];
   };
 
-  getProducts = (pageNum) => {
-    console.log(pageNum);
+  // 获取指定页码的列表数据显示
+  getProducts = async (pageNum) => {
+    this.pageNum = pageNum;
+    this.setState({ loading: false });
+
+    const { searchName, searchType } = this.state;
+    let result;
+    if (searchName) {
+      result = await reqSearchProducts({
+        pageNum,
+        pageSize: PAGE_SIZE,
+        searchName,
+        searchType,
+      });
+    } else {
+      result = await reqProducts(pageNum, PAGE_SIZE);
+    }
+
+    this.setState({ loading: false });
+    if (result.status === 0) {
+      const { total, list } = result.data;
+      this.setState({ total, products: list });
+    }
   };
 
-  updateStatus = (productId, status) => {
-    console.log(productId, status);
+  // 更新指定商品的状态
+  updateStatus = async (productId, status) => {
+    const result = await reqUpdateStatus(productId, status);
+    if (result.status === 0) {
+      message.success("更新商品成功");
+      this.getProducts(this.pageNum);
+    }
   };
 
   componentDidMount() {
