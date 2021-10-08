@@ -9,6 +9,7 @@ import Header from "../../components/Header";
 
 import Home from "../Home"
 import Category from "../Category";
+import Product from "../Product"
 
 const { Footer, Sider, Content } = Layout;
 
@@ -29,6 +30,7 @@ export default class Admin extends Component {
             <Switch>
               <Route path="/home" component={Home} />
               <Route path="/products/category" component={Category} />
+              <Route path="/product" component={Product} />
               <Redirect to="/home" />
             </Switch>
           </Content>
