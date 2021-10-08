@@ -92,7 +92,23 @@ export default class Category extends Component {
 
   // 添加分类
   addCategory = () => {
-    console.log("add");
+    this.form.validateFields(async (errors, value) => {
+      if (!errors) {
+        // 隐藏确认框
+        this.setState({ showStatus: 0 });
+
+        const { parentId, categoryName } = value;
+        this.form.resetFields();
+        const result = await reqAddCategory(categoryName, parentId);
+        if (result.status === 0) {
+          if (parentId === this.state.parentId) {
+            this.getCategorys();
+          } else if (parentId === "0") {
+            this.getCategorys("0");
+          }
+        }
+      }
+    });
   };
 
   // 显示修改的确认框
@@ -103,7 +119,20 @@ export default class Category extends Component {
 
   // 更新分类
   updateCategory = () => {
-    console.log("updateCategory()");
+    this.form.validateFields(async (errors, value) => {
+      if (!errors) {
+        // 隐藏确认框
+        this.setState({ showStatus: 0 });
+
+        const categoryId = this.category._id;
+        const { categoryName } = value;
+        this.form.resetFields();
+        const result = await reqUpdateCategory(categoryId, categoryName);
+        if (result.status === 0) {
+          this.getCategorys();
+        }
+      }
+    });
   };
 
   componentDidMount() {
@@ -152,6 +181,8 @@ export default class Category extends Component {
 
         <Modal
           title="添加分类"
+          okText="确定"
+          cancelText="取消"
           visible={showStatus === 1}
           onOk={this.addCategory}
           onCancel={this.handleCancel}
@@ -167,6 +198,8 @@ export default class Category extends Component {
 
         <Modal
           title="更新分类"
+          okText="确定"
+          cancelText="取消"
           visible={showStatus === 2}
           onOk={this.updateCategory}
           onCancel={this.handleCancel}
