@@ -13,6 +13,13 @@ export default class ProductAddUpdate extends PureComponent {
     options: [],
   };
 
+  constructor(props) {
+    super(props);
+
+    this.pw = React.createRef();
+    this.editor = React.createRef();
+  }
+
   initOptions = async (categorys) => {
     const options = categorys.map((c) => ({
       value: c._id,
@@ -54,7 +61,7 @@ export default class ProductAddUpdate extends PureComponent {
         return categorys;
       }
     }
-  }
+  };
 
   // 验证价格的自定义验证函数
   validatePrice = (rule, value) => {
@@ -69,26 +76,88 @@ export default class ProductAddUpdate extends PureComponent {
     const targetOption = selectedOptions[0];
     targetOption.loading = true;
 
-    const subCategorys 
+    const subCategorys = await this.getCategorys(targetOption.value);
+    targetOption.loading = false;
 
-    setTimeout(() => {
-      targetOption.loading = false;
-      targetOption.children = [
-        {
-          label: `${targetOption.label} Dynamic 1`,
-          value: "dynamic1",
-        },
-        {
-          label: `${targetOption.label} Dynamic 2`,
-          value: "dynamic2",
-        },
-      ];
-      setOptions([...options]);
-    }, 1000);
+    if (subCategorys && subCategorys.length > 0) {
+      const childOptions = subCategorys.map((c) => ({
+        value: c._id,
+        label: c.name,
+        isLeaf: true,
+      }));
+      targetOption.children = childOptions;
+    } else {
+      // 当前选中的分类没有二级分类
+      targetOption.isLeaf = true;
+    }
+
+    this.setState({ options: [...this.state.options] });
   };
+
+  submit = () => {
+    this.props.form.validateFields(async (error, values) => {
+      if (!error) {
+        const { name, desc, price, categoryIds } = values;
+        let pCategoryId, categoryId;
+        if (categoryIds.length === 1) {
+          pCategoryId = "0";
+          categoryId = categoryIds[0];
+        } else {
+          pCategoryId = categoryIds[0];
+          categoryId = categoryIds[1];
+        }
+        const imgs = this.pw.current.getImgs();
+        const detail = this.editor.current.getDetail();
+
+        const product = {
+          name,
+          desc,
+          price,
+          imgs,
+          detail,
+          pCategoryId,
+          categoryId,
+        };
+
+        // 如果是更新, 需要添加_id
+        if (this.isUpdate) {
+          product._id = this.product._id;
+        }
+
+        const result = await reqAddOrUpdateProduct(product);
+        if (result.status === 0) {
+          message.success(`${this.isUpdate ? "更新" : "添加"}商品成功!`);
+          this.props.history.goBack();
+        } else {
+          message.error(`${this.isUpdate ? "更新" : "添加"}商品失败!`);
+        }
+      }
+    });
+  };
+
+  componentDidMount() {
+    const product = this.props.location.state; // 如果是添加没值, 否则有值
+    this.isUpdate = !!product;
+    this.product = product || {};
+
+    this.getCategorys("0");
+  }
 
   render() {
     const { isUpdate, product } = this;
+    const { pCategoryId, categoryId, imgs, detail } = product;
+
+    const categoryIds = [];
+    if (isUpdate) {
+      // 商品是一个一级分类的商品
+      if (pCategoryId === "0") {
+        categoryIds.push(categoryId);
+      } else {
+        // 商品是一个二级分类的商品
+        categoryIds.push(pCategoryId);
+        categoryIds.push(categoryId);
+      }
+    }
 
     const layout = {
       labelCol: { span: 2 },
@@ -150,15 +219,19 @@ export default class ProductAddUpdate extends PureComponent {
               loadData={this.loadData}
             />
           </Form.Item>
+          <Form.Item label="商品图片">
+            <PicturesWall ref={this.pw} imgs={imgs} />
+          </Form.Item>
+          <Form.Item
+            label="商品详情"
+            labelCol={{ span: 2 }}
+            wrapperCol={{ span: 20 }}
+          >
+            <RichTextEditor ref={this.editor} detail={detail} />
+          </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-            <Button htmlType="button" onClick={onReset}>
-              Reset
-            </Button>
-            <Button type="link" htmlType="button" onClick={onFill}>
-              Fill form
+            <Button type="primary" onClick={this.submit}>
+              提交
             </Button>
           </Form.Item>
         </Form>
