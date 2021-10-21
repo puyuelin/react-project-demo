@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Switch, Redirect, Route } from "react-router-dom";
 import { Layout } from "antd";
 
-// import memoryUtils from "../../utils/memoryUtils";
+import memoryUtils from "../../utils/memoryUtils";
 
 import LeftNav from "../../components/LeftNav";
 import Header from "../../components/Header";

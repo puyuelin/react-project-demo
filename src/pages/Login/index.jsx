@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-// import { Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import { Form, Input, Button, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
@@ -45,10 +45,10 @@ export default class Login extends Component {
   };
 
   render() {
-    /* const user = memoryUtils.user;
+    const user = memoryUtils.user;
     if (user && user._id) {
       return <Redirect to="/" />;
-    } */
+    }
     return (
       <div className="login">
         <header className="login-header">
