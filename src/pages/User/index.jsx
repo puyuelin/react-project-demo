@@ -22,7 +22,6 @@ export default class User extends Component {
         title: "邮箱",
         dataIndex: "email",
       },
-
       {
         title: "电话",
         dataIndex: "phone",
