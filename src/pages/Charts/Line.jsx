@@ -47,6 +47,7 @@ export default class Line extends Component {
   };
 
   render() {
+    const { sales, stores } = this.state;
     return (
       <div>
         <Card>

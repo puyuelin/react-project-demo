@@ -1,9 +1,10 @@
 import React, { Component } from "react";
+import { message, Button, Card, Table, Modal } from "antd";
 
 import { PAGE_SIZE } from "../../utils/constants";
 import { reqRoles, reqAddRole, reqUpdateRole } from "../../api";
-import AddForm from "./add-form";
-import AuthForm from "./auth-form";
+import AddForm from "./AddForm";
+import AuthForm from "./AuthForm";
 import memoryUtils from "../../utils/memoryUtils";
 import { formateDate } from "../../utils/dateUtils";
 import storageUtils from "../../utils/storageUtils";

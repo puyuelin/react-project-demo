@@ -32,7 +32,7 @@ export default class Category extends Component {
               修改分类
             </LinkButton>
             {this.state.parentId === "0" ? (
-              <LinkButton onClick={() => this.showCategorys(category)}>
+              <LinkButton onClick={() => this.showSubCategorys(category)}>
                 查看子分类
               </LinkButton>
             ) : null}
@@ -81,7 +81,7 @@ export default class Category extends Component {
 
   // 响应点击取消: 隐藏确定框
   handleCancel = () => {
-    this.form.resetFields();
+    this.form.current.resetFields();
     this.setState({ showStatus: 0 });
   };
 
@@ -92,13 +92,13 @@ export default class Category extends Component {
 
   // 添加分类
   addCategory = () => {
-    this.form.validateFields(async (errors, value) => {
+    this.form.current.validateFields().then(async (values, errors) => {
       if (!errors) {
         // 隐藏确认框
         this.setState({ showStatus: 0 });
 
-        const { parentId, categoryName } = value;
-        this.form.resetFields();
+        const { parentId, categoryName } = values;
+        this.form.current.resetFields();
         const result = await reqAddCategory(categoryName, parentId);
         if (result.status === 0) {
           if (parentId === this.state.parentId) {
@@ -119,14 +119,14 @@ export default class Category extends Component {
 
   // 更新分类
   updateCategory = () => {
-    this.form.validateFields(async (errors, value) => {
+    this.form.current.validateFields().then(async (values, errors) => {
       if (!errors) {
         // 隐藏确认框
         this.setState({ showStatus: 0 });
 
         const categoryId = this.category._id;
-        const { categoryName } = value;
-        this.form.resetFields();
+        const { categoryName } = values;
+        this.form.current.resetFields();
         const result = await reqUpdateCategory(categoryId, categoryName);
         if (result.status === 0) {
           this.getCategorys();

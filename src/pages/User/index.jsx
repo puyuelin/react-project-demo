@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Card, Button, Table, Modal, message } from "antd";
 import { formateDate } from "../../utils/dateUtils";
-import LinkButton from "../../components/link-button/index";
+import LinkButton from "../../components/LinkButton";
 import { reqDeleteUser, reqUsers, reqAddOrUpdateUser } from "../../api";
 import UserForm from "./UserForm";
 

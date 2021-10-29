@@ -139,6 +139,7 @@ export default class ProductAddUpdate extends PureComponent {
     const product = this.props.location.state; // 如果是添加没值, 否则有值
     this.isUpdate = !!product;
     this.product = product || {};
+    console.log(this.props);
 
     this.getCategorys("0");
   }
