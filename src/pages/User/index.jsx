@@ -78,8 +78,8 @@ export default class User extends Component {
   addOrUpdateUser = async () => {
     this.setState({ isShow: false });
 
-    const user = this.form.getFieldsValue();
-    this.form.resetFields();
+    const user = this.form.current.getFieldsValue();
+    this.form.current.resetFields();
     // 如果是更新, 给user指定_id属性
     if (this.user) {
       user._id = this.user._id;
@@ -89,6 +89,8 @@ export default class User extends Component {
     if (result.status === 0) {
       message.success(`${this.user ? "修改" : "添加"}用户成功`);
       this.getUsers();
+    } else {
+      message.error(result.msg);
     }
   };
 
@@ -143,7 +145,7 @@ export default class User extends Component {
           visible={isShow}
           onOk={this.addOrUpdateUser}
           onCancel={() => {
-            this.form.resetFields();
+            this.form.current.resetFields();
             this.setState({ isShow: false });
           }}
         >

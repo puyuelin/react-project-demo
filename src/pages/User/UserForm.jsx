@@ -5,6 +5,8 @@ import { Form, Select, Input } from "antd";
 const { Option } = Select;
 
 export default class UserForm extends PureComponent {
+  formRef = React.createRef();
+
   static propTypes = {
     setForm: PropTypes.func.isRequired,
     roles: PropTypes.array.isRequired,
@@ -12,14 +14,14 @@ export default class UserForm extends PureComponent {
   };
 
   componentDidMount() {
-    this.props.setForm(this.props.form);
+    this.props.setForm(this.formRef);
   }
 
   render() {
     const { roles, user } = this.props;
 
     return (
-      <Form labelCol={{ span: 4 }} wrapperCol={{ span: 15 }}>
+      <Form labelCol={{ span: 4 }} wrapperCol={{ span: 15 }} ref={this.formRef}>
         <Form.Item label="用户名" name="username" initialValue={user.username}>
           <Input placeholder="请输入用户名" />
         </Form.Item>

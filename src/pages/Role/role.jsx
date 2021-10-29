@@ -1,22 +1,20 @@
 import React, { Component } from "react";
-import { message, Button, Card, Table, Modal } from "antd";
-
+import { Card, Button, Table, Modal, message } from "antd";
 import { PAGE_SIZE } from "../../utils/constants";
 import { reqRoles, reqAddRole, reqUpdateRole } from "../../api";
-import AddForm from "./AddForm";
-import AuthForm from "./AuthForm";
+import AddForm from "./add-form";
+import AuthForm from "./auth-form";
 import memoryUtils from "../../utils/memoryUtils";
 import { formateDate } from "../../utils/dateUtils";
 import storageUtils from "../../utils/storageUtils";
 
+/*
+角色路由
+ */
 export default class Role extends Component {
   state = {
     roles: [], // 所有角色的列表
-    role: {
-      menus: [],
-      auth_time: "",
-      auth_name: "",
-    }, // 选中的role
+    role: {}, // 选中的role
     isShowAdd: false, // 是否显示添加界面
     isShowAuth: false, // 是否显示设置权限界面
   };
@@ -63,47 +61,78 @@ export default class Role extends Component {
   onRow = (role) => {
     return {
       onClick: (event) => {
-        this.setState({ role });
+        // 点击行
+        console.log("row onClick()", role);
+        // alert('点击行')
+        this.setState({
+          role,
+        });
       },
     };
   };
 
-  // 添加角色
+  /*
+  添加角色
+   */
   addRole = () => {
-    this.form.current.validateFields().then(async (values, error) => {
+    // 进行表单验证, 只能通过了才向下处理
+    this.form.validateFields(async (error, values) => {
       if (!error) {
-        this.setState({ isShowAdd: false });
+        // 隐藏确认框
+        this.setState({
+          isShowAdd: false,
+        });
 
+        // 收集输入数据
         const { roleName } = values;
-        this.form.current.resetFields();
+        this.form.resetFields();
 
+        // 请求添加
         const result = await reqAddRole(roleName);
+        // 根据结果提示/更新列表显示
         if (result.status === 0) {
           message.success("添加角色成功");
+          // this.getRoles()
+          // 新产生的角色
           const role = result.data;
+          // 更新roles状态
+          /*const roles = this.state.roles
+          roles.push(role)
+          this.setState({
+            roles
+          })*/
+
+          // 更新roles状态: 基于原本状态数据更新
           this.setState((state) => ({
             roles: [...state.roles, role],
           }));
+        } else {
+          message.success("添加角色失败");
         }
-      } else {
-        message.success("添加角色失败");
       }
     });
   };
 
-  // 更新角色
+  /*
+  更新角色
+   */
   updateRole = async () => {
-    this.setState({ isShowAdd: false });
+    // 隐藏确认框
+    this.setState({
+      isShowAuth: false,
+    });
 
     const role = this.state.role;
-    // const menus = this.auth.current.getMenus();
-    const menus = this.auth.state.checkedKeys;
+    // 得到最新的menus
+    const menus = this.auth.current.getMenus();
     role.menus = menus;
     role.auth_time = Date.now();
     role.auth_name = memoryUtils.user.username;
 
+    // 请求更新
     const result = await reqUpdateRole(role);
     if (result.status === 0) {
+      // this.getRoles()
       // 如果当前更新的是自己角色的权限, 强制退出
       if (role._id === memoryUtils.user.role_id) {
         memoryUtils.user = {};
@@ -119,8 +148,11 @@ export default class Role extends Component {
     }
   };
 
-  componentDidMount() {
+  componentWillMount() {
     this.initColumn();
+  }
+
+  componentDidMount() {
     this.getRoles();
   }
 
@@ -147,18 +179,21 @@ export default class Role extends Component {
     );
 
     return (
-      <Card title={title} bordered={false}>
+      <Card title={title}>
         <Table
-          dataSource={roles}
-          columns={this.columns}
           bordered
           rowKey="_id"
+          dataSource={roles}
+          columns={this.columns}
           pagination={{ defaultPageSize: PAGE_SIZE }}
           rowSelection={{
             type: "radio",
             selectedRowKeys: [role._id],
             onSelect: (role) => {
-              this.setState({ role });
+              // 选择某个radio时回调
+              this.setState({
+                role,
+              });
             },
           }}
           onRow={this.onRow}
@@ -170,7 +205,7 @@ export default class Role extends Component {
           onOk={this.addRole}
           onCancel={() => {
             this.setState({ isShowAdd: false });
-            this.form.current.resetFields();
+            this.form.resetFields();
           }}
         >
           <AddForm setForm={(form) => (this.form = form)} />

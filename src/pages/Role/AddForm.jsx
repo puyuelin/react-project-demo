@@ -3,17 +3,19 @@ import PropTypes from "prop-types";
 import { Form, Input } from "antd";
 
 export default class AddForm extends Component {
+  formRef = React.createRef();
+
   static propTypes = {
     setForm: PropTypes.func.isRequired,
   };
 
   componentDidMount() {
-    this.props.setForm(this.props.form);
+    this.props.setForm(this.formRef);
   }
 
   render() {
     return (
-      <Form>
+      <Form ref={this.formRef}>
         <Form.Item
           label="角色名称"
           name="roleName"
