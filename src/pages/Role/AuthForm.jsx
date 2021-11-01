@@ -21,10 +21,11 @@ export default class AuthForm extends Component {
   // 选中某个node时的回调
   onCheck = (checkedKeys) => {
     this.setState({ checkedKeys });
-    console.log(this.state.checkedKeys);
+    this.props.role.menus = checkedKeys;
   };
 
   render() {
+    this.props.role.menus = [];
     const { role } = this.props;
     const { checkedKeys } = this.state;
 

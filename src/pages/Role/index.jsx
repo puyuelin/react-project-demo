@@ -93,12 +93,12 @@ export default class Role extends Component {
 
   // 更新角色
   updateRole = async () => {
-    this.setState({ isShowAdd: false });
+    this.setState({ isShowAuth: false });
 
     const role = this.state.role;
     // const menus = this.auth.current.getMenus();
-    const menus = this.auth.state.checkedKeys;
-    role.menus = menus;
+    // const menus = this.auth.state.checkedKeys;
+    // role.menus = menus;
     role.auth_time = Date.now();
     role.auth_name = memoryUtils.user.username;
 

@@ -18,6 +18,7 @@ export default class ProductAddUpdate extends PureComponent {
 
     this.pw = React.createRef();
     this.editor = React.createRef();
+    this.formRef = React.createRef();
   }
 
   initOptions = async (categorys) => {
@@ -29,7 +30,7 @@ export default class ProductAddUpdate extends PureComponent {
 
     // 如果是一个二级分类商品的更新
     const { isUpdate, product } = this;
-    const { pCategoryId } = product;
+    const { pCategoryId } = product || "";
     if (isUpdate && pCategoryId !== "0") {
       const subCategorys = await this.getCategorys(pCategoryId);
       const childOptions = subCategorys.map((c) => ({
@@ -95,7 +96,7 @@ export default class ProductAddUpdate extends PureComponent {
   };
 
   submit = () => {
-    this.props.form.validateFields(async (error, values) => {
+    this.formRef.current.validateFields().then(async (values, error) => {
       if (!error) {
         const { name, desc, price, categoryIds } = values;
         let pCategoryId, categoryId;
@@ -136,20 +137,26 @@ export default class ProductAddUpdate extends PureComponent {
   };
 
   componentDidMount() {
-    const product = this.props.location.state; // 如果是添加没值, 否则有值
-    this.isUpdate = !!product;
-    this.product = product || {};
-    console.log(this.props);
-
     this.getCategorys("0");
   }
 
   render() {
-    const { isUpdate, product } = this;
-    const { pCategoryId, categoryId, imgs, detail } = product;
+    const product = this.props.location.state; // 如果是添加没值, 否则有值
+    this.isUpdate = !!product;
+    this.product = product;
+
+    // const {pCategoryId, categoryId, imgs, detail} = product
+    const { pCategoryId } = product || "";
+    const { categoryId } = product || "";
+    const { imgs } = product || [];
+    const { detail } = product || "";
+
+    const {name} = product || "";
+    const {desc} = product || "";
+    const {price} = product || "";
 
     const categoryIds = [];
-    if (isUpdate) {
+    if (this.isUpdate) {
       // 商品是一个一级分类的商品
       if (pCategoryId === "0") {
         categoryIds.push(categoryId);
@@ -167,22 +174,22 @@ export default class ProductAddUpdate extends PureComponent {
 
     const title = (
       <span>
-        <LinkButton
-          onClick={() => this.props.history.goBack()}
-          icon={<ArrowLeftOutlined style={{ fontSize: 20 }} />}
-        ></LinkButton>
-        <span>{isUpdate ? "修改商品" : "添加商品"}</span>
+        <LinkButton onClick={() => this.props.history.goBack()}>
+          <ArrowLeftOutlined style={{ marginRight: 10, fontSize: 20 }} />
+        </LinkButton>
+
+        <span>{this.isUpdate ? "修改商品" : "添加商品"}</span>
       </span>
     );
 
     return (
       <Card title={title}>
-        <Form {...layout}>
+        <Form {...layout} ref={this.formRef}>
           <Form.Item
             name="name"
             label="商品名称"
             rules={[{ required: true, message: "必须输入商品名称" }]}
-            initialValue={product.name}
+            initialValue={name}
           >
             <Input placeholder="请输入商品名称" />
           </Form.Item>
@@ -190,7 +197,7 @@ export default class ProductAddUpdate extends PureComponent {
             name="desc"
             label="商品描述"
             rules={[{ required: true, message: "必须输入商品描述" }]}
-            initialValue={product.desc}
+            initialValue={desc}
           >
             <TextArea
               placeholder="请输入商品描述"
@@ -204,7 +211,7 @@ export default class ProductAddUpdate extends PureComponent {
               { required: true, message: "必须输入商品价格" },
               { validator: this.validatePrice },
             ]}
-            initialValue={product.price}
+            initialValue={price}
           >
             <Input type="number" placeholder="请输入商品价格" addonAfter="元" />
           </Form.Item>
@@ -212,7 +219,7 @@ export default class ProductAddUpdate extends PureComponent {
             name="categoryIds"
             label="商品分类"
             rules={[{ required: true, message: "必须指定商品分类" }]}
-            initialValue={product.categoryIds}
+            initialValue={categoryIds}
           >
             <Cascader
               placeholder="请指定商品分类"

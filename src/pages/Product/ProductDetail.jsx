@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { List, Card } from "antd";
-import { ArrowUpOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 
 import LinkButton from "../../components/LinkButton";
 import { BASE_IMG_URL } from "../../utils/constants";
@@ -21,7 +21,7 @@ export default class ProductDetail extends Component {
     const title = (
       <span>
         <LinkButton onClick={() => this.props.history.goBack()}>
-          <ArrowUpOutlined style={{ marginRight: 10, fontSize: 20 }} />
+          <ArrowLeftOutlined style={{ marginRight: 10, fontSize: 20 }} />
         </LinkButton>
 
         <span>商品详情</span>

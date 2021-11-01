@@ -11,15 +11,35 @@ export default class RichTextEditor extends Component {
     detail: PropTypes.string,
   };
 
-  state = {
-    editorState: EditorState.createEmpty(), // 创建一个没有内容的编辑对象
-  };
+  constructor(props) {
+    super(props);
+    // 根据传入的 html 文本初始显示
+    const detail = this.props.detail;
+    let editorState;
+    if (detail) {
+      // 如果传入才需要做处理
+      const blocksFromHtml = htmlToDraft(detail);
+      const { contentBlocks, entityMap } = blocksFromHtml;
+      const contentState = ContentState.createFromBlockArray(
+        contentBlocks,
+        entityMap
+      );
+      editorState = EditorState.createWithContent(contentState);
+    } else {
+      editorState = EditorState.createEmpty();
+    }
+    // 初始化状态;
+    this.state = {
+      editorState,
+    };
+  }
 
-  // 输入过程中实时的回调
+  // 当输入改变时立即保存状态数据
   onEditorStateChange = (editorState) => {
     this.setState({ editorState });
   };
 
+  // 得到输入的富文本数据
   getDetail = () => {
     return draftToHtml(
       convertToRaw(this.state.editorState.getCurrentContent())
